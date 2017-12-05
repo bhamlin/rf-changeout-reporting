@@ -19,19 +19,30 @@ COLS=[
     ('Photo3', 'photo3')
 ]
 
+class RF_Changeout():
+    @staticmethod
+    def from_row(row):
+        self = RF_Changeout()
+        for key, col in COLS:
+            if key in row:
+                setattr(self, col, row[key])
+        self.fix_gps()
+        return self
+    
+    def fix_gps(self):
+        gps = getattr(self, 'gps', None)
+        if gps:
+            u, v = gps.replace(' ', '').split(',')
+            if u and v:
+                self.gps_x = float(u) # Latitude
+                self.gps_y = float(v) # Longitude
+                del self.gps
+
 def collect_rows(row, data):
     oid = row['order_id']
     key = row['data_point']
     val = row['value']
     if not oid in data:
         data[oid] = dict()
+        data[oid]['dts'] = row['dts']
     data[oid][key] = val
-
-def row_to_record(row):
-    output = list()
-    for field, col in COLS:
-        if field in row:
-            output.append(row[field])
-        else:
-            output.append(None)
-    return output
