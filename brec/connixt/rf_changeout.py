@@ -66,8 +66,8 @@ class RF_Changeout():
         if gps:
             u, v = gps.replace(' ', '').split(',')
             if u and v:
-                self.gps_x = float(u) # Latitude
-                self.gps_y = float(v) # Longitude
+                self.gps_y = float(u) # Latitude
+                self.gps_x = float(v) # Longitude
                 del self.gps
 
     def get_data(self):
