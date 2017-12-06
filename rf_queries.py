@@ -72,3 +72,55 @@ INSERT INTO hunt.rf_changeout_cc (
 VALUES (%s)
 
 '''.strip()
+
+ATS_PSQL_LIST_METERS_TO_ACCOUNT='''
+
+select cd.id, cd.old_meter_number
+from hunt.rf_changeout_data cd
+  left join hunt.rf_changeout_ats_data ad on cd.id = ad.data_id
+where ad.account_number is null or ad.map_number is null
+
+'''.strip()
+
+ATS_PSQL_LIST_NEW_METERS_TO_ACCOUNT='''
+
+select cd.id, cd.new_meter_number
+from hunt.rf_changeout_data cd
+  left join hunt.rf_changeout_ats ad on cd.id = ad.data_id
+where ad.new_meter_on_account = 'f'
+
+'''.strip()
+
+ATS_ORAC_GET_ACCOUNTS_FOR_METER='''
+
+select sm.meterno, am.accountno, loc.name as mapno
+from CISDATA.SERVICE_METERS sm
+  left join CISDATA.ACCOUNT_MASTER am on sm.LOCATION_ID = am.LOCATION_ID
+  left join FMDATA.LOCATION loc on sm.LOCATION_ID = loc.LOCATION_ID
+where sm.meterno in ('{}')
+
+'''.strip()
+
+ATS_PSQL_INSERT_ACCOUNT='''
+
+INSERT INTO hunt.rf_changeout_ats_data(
+            data_id, account_number, map_number)
+    VALUES (%s, %s, %s);
+
+'''.strip()
+
+ATS_PSQL_SET_OLD_METER='''
+
+UPDATE hunt.rf_changeout_ats
+   SET old_meter_on_account='t'
+ WHERE data_id=%s;
+
+'''.strip()
+
+ATS_PSQL_SET_NEW_METER='''
+
+UPDATE hunt.rf_changeout_ats
+   SET new_meter_on_account='t'
+ WHERE data_id=%s;
+
+'''.strip()
