@@ -67,10 +67,16 @@ class PostgreSQL(DatabaseConnection):
             cur.execute(''' SELECT setval('hunt.rf_changeout_loc_id_seq', 1, true) ''')
             cur.execute(''' SELECT setval('hunt.rf_changeout_photos_id_seq', 1, true) ''')
             cur.execute(''' SELECT setval('hunt.rf_changeout_site_insp_id_seq', 1, true) ''')
+            cur.execute(''' SELECT setval('hunt.rf_changeout_ats_id_seq', 1, true) ''')
+            cur.execute(''' SELECT setval('hunt.rf_changeout_ats_data_id_seq', 1, true) ''')
+            cur.execute(''' SELECT setval('hunt.rf_changeout_cc_id_seq', 1, true) ''')
             cur.execute(''' VACUUM FULL hunt.rf_changeout_data ''')
             cur.execute(''' VACUUM FULL hunt.rf_changeout_loc ''')
             cur.execute(''' VACUUM FULL hunt.rf_changeout_photos ''')
             cur.execute(''' VACUUM FULL hunt.rf_changeout_site_insp ''')
+            cur.execute(''' VACUUM FULL hunt.rf_changeout_ats ''')
+            cur.execute(''' VACUUM FULL hunt.rf_changeout_ats_data ''')
+            cur.execute(''' VACUUM FULL hunt.rf_changeout_cc ''')
     
     def close(self):
         self._db.close()

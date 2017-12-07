@@ -63,7 +63,7 @@ class RF_Changeout():
 
     def fix_gps(self):
         gps = getattr(self, 'gps', None)
-        if gps:
+        if gps and not 'None' in gps:
             u, v = gps.replace(' ', '').split(',')
             if u and v:
                 self.gps_y = float(u) # Latitude

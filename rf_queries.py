@@ -1,12 +1,18 @@
+GET_LAST_ENTRY='''
+
+select max(dts) from hunt.rf_changeout_data
+
+'''.strip()
+
 LIST_ITEMS='''
 
-SELECT sono AS order_id, data_point, value, '2017-11-28 14:00:00.000000' as dts
+SELECT sono AS order_id, data_point, value, brec_ts as dts
   FROM connixt.report_data 
-  WHERE sono LIKE 'RM%' 
+  WHERE sono LIKE 'RM%' and brec_ts > '{0}'
  UNION
 SELECT cxid AS order_id, data_point, value, brec_ts as dts
   FROM connixt.adhoc_data 
-  WHERE order_type = 'AMI Change Out' 
+  WHERE order_type = 'AMI Change Out' and brec_ts > '{0}'
 ORDER  BY dts
 
 '''.strip()
@@ -96,8 +102,9 @@ ATS_ORAC_GET_ACCOUNTS_FOR_METER='''
 select sm.meterno, am.accountno, loc.name as mapno
 from CISDATA.SERVICE_METERS sm
   left join CISDATA.ACCOUNT_MASTER am on sm.LOCATION_ID = am.LOCATION_ID
+  left join CISDATA.ACCOUNT_STATUS ams on am.ACCOUNT_STATUS_ID = ams.ACCOUNT_STATUS_ID
   left join FMDATA.LOCATION loc on sm.LOCATION_ID = loc.LOCATION_ID
-where sm.meterno in ('{}')
+where ams.ACCOUNT_STATUS_DESC != 'Inactive' and sm.meterno in ('{}')
 
 '''.strip()
 
@@ -120,7 +127,7 @@ UPDATE hunt.rf_changeout_ats
 ATS_PSQL_SET_NEW_METER='''
 
 UPDATE hunt.rf_changeout_ats
-   SET new_meter_on_account='t'
+   SET old_meter_on_account='t', new_meter_on_account='t'
  WHERE data_id=%s;
 
 '''.strip()

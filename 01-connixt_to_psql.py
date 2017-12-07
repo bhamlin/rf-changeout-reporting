@@ -14,8 +14,10 @@ def S(generator):
 
 c = PostgreSQL(localconfig.PGSQL_DSN)
 
+LAST_ENTRY = S(c.execute(rfq.GET_LAST_ENTRY))['max']
+
 data=dict()
-for item in c.execute(rfq.LIST_ITEMS):
+for item in c.execute(rfq.LIST_ITEMS.format(LAST_ENTRY)):
     rfc.collect_rows(item, data)
 
 for item, data in data.items():
