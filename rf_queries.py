@@ -104,7 +104,7 @@ from CISDATA.SERVICE_METERS sm
   left join CISDATA.ACCOUNT_MASTER am on sm.LOCATION_ID = am.LOCATION_ID
   left join CISDATA.ACCOUNT_STATUS ams on am.ACCOUNT_STATUS_ID = ams.ACCOUNT_STATUS_ID
   left join FMDATA.LOCATION loc on sm.LOCATION_ID = loc.LOCATION_ID
-where ams.ACCOUNT_STATUS_DESC != 'Inactive' and sm.meterno in ('{}')
+where (ams.ACCOUNT_STATUS_DESC != 'Inactive') and (sm.meterno in ('{}'))
 
 '''.strip()
 

@@ -11,27 +11,27 @@ old_meters = dict()
 new_meters = dict()
 for item in c.execute(rfq.ATS_PSQL_LIST_METERS_TO_ACCOUNT):
     meter = item['old_meter_number'].strip()
-    id = item['id']
-    old_meters[meter] = {'id': id}
+    if meter.isdigit():
+        id = item['id']
+        old_meters[meter] = {'id': id}
 for item in c.execute(rfq.ATS_PSQL_LIST_NEW_METERS_TO_ACCOUNT):
     meter = item['new_meter_number'].strip()
-    id = item['id']
-    new_meters[meter] = {'id': id}
+    if meter.isdigit():
+        id = item['id']
+        new_meters[meter] = {'id': id}
 
 ########################
 ## ORACLE ZOOOOOOOONE ##
 o = Oracle(localconfig.ORA_DSN)
 
 for row in o.execute(rfq.ATS_ORAC_GET_ACCOUNTS_FOR_METER.format(
-    "','".join(old_meters.keys())
-)):
+    "','".join(old_meters.keys()) )):
     meter, account, mapno = map(str, row)
     if meter in old_meters:
         old_meters[meter]['account'] = account
         old_meters[meter]['mapno'] = mapno
 for row in o.execute(rfq.ATS_ORAC_GET_ACCOUNTS_FOR_METER.format(
-    "','".join(new_meters.keys())
-)):
+    "','".join(new_meters.keys()) )):
     meter, account, mapno = map(str, row)
     if meter in new_meters:
         new_meters[meter]['account'] = account
