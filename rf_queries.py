@@ -131,3 +131,35 @@ UPDATE hunt.rf_changeout_ats
  WHERE data_id=%s;
 
 '''.strip()
+
+CC_PSQL_NEW_METERS='''
+
+select cd.new_meter_number
+   FROM hunt.rf_changeout_data cd
+     left join hunt.rf_changeout_ats ad on cd.id = ad.data_id
+     left join hunt.rf_changeout_cc cc on cd.id = cc.data_id
+   where ad.new_meter_on_account = False
+     and ad.old_meter_on_account = True
+     and cc.new_meter_exists = False
+
+'''.strip()
+
+CC_PSQL_SET_NEW_METERS='''
+
+update hunt.rf_changeout_cc
+  set new_meter_exists = True
+where data_id in (select id
+    from hunt.rf_changeout_data cd
+    where cd.new_meter_number in (
+      '{}'
+    ))
+
+'''.strip()
+
+CC_MSS_FIND_NEW_METERS='''
+
+select meterNo
+from Meters m
+where meterNo in ('{}')
+
+'''.strip()

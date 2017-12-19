@@ -22,6 +22,30 @@ class DatabaseConnection:
             cur.execute(query, args)
             cur.execute('commit transaction')
 
+class MSSQL(DatabaseConnection):
+    def __init__(self, *args):
+        super().__init__()
+        self.DEBUG = False
+        self._ms = __import__('pymssql')
+        if args:
+            self.connect(*args)
+    
+    def _get_cursor(self):
+        return self._db.cursor()
+    
+    def close(self):
+        self._db.close()
+    
+    def connect(self, *args):
+        self._db = self._ms.connect(*args)
+
+    def execute(self, query):
+        cur = self._get_cursor()
+        cur.execute(query)
+        for record in cur:
+            yield record
+        cur.close()
+
 class Oracle(DatabaseConnection):
     def __init__(self, dsn=None):
         super().__init__()
