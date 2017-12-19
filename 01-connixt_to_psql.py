@@ -36,5 +36,3 @@ for item, data in data.items():
         c.execute_crud_args(rfq.RFC_INSERT_CC, id)
 
 c.close()
-
-print()
