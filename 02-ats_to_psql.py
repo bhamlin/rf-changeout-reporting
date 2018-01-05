@@ -43,16 +43,22 @@ o.close()
 for meter, data in old_meters.items():
     if (('id' in data and 'account' in data and 'mapno' in data)
      and (data['id'] and (data['account'] or data['mapno']))):
+        print("+ {}, {}, {}".format(data['id'], data['account'], data['mapno']))
         c.execute_crud_args(rfq.ATS_PSQL_INSERT_ACCOUNT,
                 data['id'], data['account'], data['mapno'])
         c.execute_crud_args(rfq.ATS_PSQL_SET_OLD_METER,
                 data['id'])
+    else:
+        print("  {}".format(data))
 for meter, data in new_meters.items():
     if (('id' in data and 'account' in data and 'mapno' in data)
      and (data['id'] and (data['account'] or data['mapno']))):
+        print("+ {}, {}, {}".format(data['id'], data['account'], data['mapno']))
         c.execute_crud_args(rfq.ATS_PSQL_INSERT_ACCOUNT,
                 data['id'], data['account'], data['mapno'])
         c.execute_crud_args(rfq.ATS_PSQL_SET_NEW_METER,
                 data['id'])
+    else:
+        print("  {}".format(data))
 
 c.close()

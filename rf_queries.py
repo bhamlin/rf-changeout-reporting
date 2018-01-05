@@ -97,15 +97,44 @@ where ad.new_meter_on_account = 'f'
 
 '''.strip()
 
+# ATS_ORAC_GET_ACCOUNTS_FOR_METER='''
+# 
+# select sm.meterno, am.accountno, loc.name as mapno
+# from CISDATA.SERVICE_METERS sm
+#   left join CISDATA.ACCOUNT_MASTER am on sm.LOCATION_ID = am.LOCATION_ID
+#   left join CISDATA.ACCOUNT_STATUS ams on am.ACCOUNT_STATUS_ID = ams.ACCOUNT_STATUS_ID
+#   left join FMDATA.LOCATION loc on sm.LOCATION_ID = loc.LOCATION_ID
+# where (ams.ACCOUNT_STATUS_DESC != 'Inactive') and (sm.meterno in ('{}'))
+# 
+# '''.strip()
+
 ATS_ORAC_GET_ACCOUNTS_FOR_METER='''
 
-select sm.meterno, am.accountno, loc.name as mapno
-from CISDATA.SERVICE_METERS sm
-  left join CISDATA.ACCOUNT_MASTER am on sm.LOCATION_ID = am.LOCATION_ID
-  left join CISDATA.ACCOUNT_STATUS ams on am.ACCOUNT_STATUS_ID = ams.ACCOUNT_STATUS_ID
-  left join FMDATA.LOCATION loc on sm.LOCATION_ID = loc.LOCATION_ID
-where (ams.ACCOUNT_STATUS_DESC != 'Inactive') and (sm.meterno in ('{}'))
-
+SELECT sm.meterno, am.accountno, loc.name AS mapno
+FROM cisdata.service_meters sm
+    LEFT JOIN cisdata.account_master am ON sm.location_id = am.location_id
+    LEFT JOIN cisdata.account_status ams ON am.account_status_id = ams.account_status_id
+    LEFT JOIN fmdata.location loc ON sm.location_id = loc.location_id
+WHERE
+    ( ams.account_status_desc != 'Inactive' )
+    AND   ( sm.meterno IN ('{0}') )
+UNION
+SELECT meterno, accountno, mapno
+FROM (  SELECT sm.meterno, am.accountno, loc.name AS mapno,
+            RANK() OVER(
+                PARTITION BY loc.name
+                ORDER BY
+                    am.disconnect_date DESC
+            ) AS loc_rnk
+        FROM cisdata.service_meters sm
+            LEFT JOIN cisdata.account_master am ON sm.location_id = am.location_id
+            LEFT JOIN cisdata.account_status ams ON am.account_status_id = ams.account_status_id
+            LEFT JOIN fmdata.location loc ON sm.location_id = loc.location_id
+        WHERE
+            ( ams.account_status_desc = 'Inactive' )
+            AND   ( sm.meterno IN ( '{0}' ) )
+    ) data
+WHERE loc_rnk = 1
 '''.strip()
 
 ATS_PSQL_INSERT_ACCOUNT='''
